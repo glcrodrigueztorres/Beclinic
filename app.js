@@ -2,8 +2,8 @@ const { createBot, createProvider, createFlow, addKeyword } = require('@bot-what
 
 const QRPortalWeb = require('@bot-whatsapp/portal')
 const BaileysProvider = require('@bot-whatsapp/provider/baileys')
-const MySQLAdapter = require('@bot-whatsapp/database/mysql')
-
+//const MySQLAdapter = require('@bot-whatsapp/database/mysql')
+const MockAdapter = require('@bot-whatsapp/database/mock')
 /**
  * Declaramos las conexiones de MySQL
  */
@@ -57,9 +57,13 @@ const flowTratamientosFaciales = addKeyword(['5', 'Tratamientos faciales', 'rost
     );
     
 const flowMEP = addKeyword(['4', 'MEP', 'estrías', 'Tratamiento para estrías'])
-    .addAnswer(['Elimina estrías, una sesión a la semana.',
+    .addAnswer(['Antiestria MEP: La corriente galvánica estimula el colágeno haciendo  que se formen otra vez las fibras de colageno de manera ordenada y con más resistencia, mejorando la textura y color de la piel.',
         'Agendar evaluación para determinar tratamiento.'
-    ]);
+    ],
+    {
+        media: 'MEP.jpeg'
+    }
+    );
 
 const flowVelashape = addKeyword(['3', 'Velashape', 'celulitis'])
     .addAnswer(['Velashape Elimina la celulitis, mejora la textura, reduce la grasa localizada y modela tú cuerpo, entregando una piel más firme, joven y tonificada, es una combinación de  tres tecnologías como son la radiofrecuencia, estimulando el colágeno de la zona tratada, láser infrarrojo calienta las capas más profundas de la piel y  Vacumterapia favorece la circulación sanguínea y el drenaje linfático., sesiones recomendadas de (8 a 10s).'
@@ -105,7 +109,7 @@ const flowPrincipal = addKeyword(['menu', 'Menu', 'MENU', 'opciones', 'Categoria
     [flowAgendarEvaluacion, flowCriolipolisis, flowVelashape, flowMEP, flowTratamientosFaciales, flowDepilacionLaser, flowsolarium, flowOtro]
 );
 
-const main = async () => {
+/**const main = async () => {
     const adapterDB = new MySQLAdapter({
         host: MYSQL_DB_HOST,
         user: MYSQL_DB_USER,
@@ -120,6 +124,22 @@ const main = async () => {
         provider: adapterProvider,
         database: adapterDB,
     })
+    QRPortalWeb()
+}
+
+main()
+*/
+const main = async () => {
+    const adapterDB = new MockAdapter()
+    const adapterFlow = createFlow([flowPrincipal])
+    const adapterProvider = createProvider(BaileysProvider)
+
+    createBot({
+        flow: adapterFlow,
+        provider: adapterProvider,
+        database: adapterDB,
+    })
+
     QRPortalWeb()
 }
 
